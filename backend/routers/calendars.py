@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get("/historical")
-def get_historical_calendar():
+def get_historical_calendar(_: User = Depends(require_role(UserRole.premium))):
     try:
         with open("calendar_historical.json", "r", encoding="utf-8") as f:
             return json.load(f)
@@ -21,7 +21,7 @@ def get_historical_calendar():
 
 
 @router.get("/fundamental")
-def get_fundamental_calendar():
+def get_fundamental_calendar(_: User = Depends(require_role(UserRole.premium))):
     try:
         with open("calendar_fundamental.json", "r", encoding="utf-8") as f:
             return json.load(f)

@@ -2,7 +2,9 @@ import json
 from datetime import datetime
 from typing import List
 import pandas as pd
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from backend.routers.auth import get_current_user
+from backend.models import User, UserRole
 from backend.services.market_data import fetch_price_history, compute_daily_returns
 
 
@@ -10,7 +12,7 @@ router = APIRouter()
 
 
 @router.get("/search/{symbol}")
-def search_symbol(symbol: str):
+def search_symbol(symbol: str, user: User | None = Depends(lambda: None)):
     # Load historical calendar
     try:
         with open("calendar_historical.json", "r", encoding="utf-8") as f:
@@ -43,8 +45,9 @@ def search_symbol(symbol: str):
         candidates.append((row["Date"], item.get("up_probability", 0.5)))
 
     candidates.sort(key=lambda x: x[1], reverse=True)
-    best_buy = [str(d.date()) for d, _ in candidates[:5]]
-    best_sell = [str(d.date()) for d, _ in sorted(candidates[:5], key=lambda x: x[1])]  # naive opposite
+    limit = 5 if (user and user.role in (UserRole.premium, UserRole.admin)) else 2
+    best_buy = [str(d.date()) for d, _ in candidates[:limit]]
+    best_sell = [str(d.date()) for d, _ in sorted(candidates[:limit], key=lambda x: x[1])]  # naive opposite
 
     fund_item = next((i for i in fund.get("items", []) if i.get("symbol") == symbol), None)
 
