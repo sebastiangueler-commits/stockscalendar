@@ -19,6 +19,9 @@ class Settings(BaseModel):
 
     DATA_CACHE_DIR: str = os.getenv("DATA_CACHE_DIR", "./data_cache")
     HISTORICAL_START: str = os.getenv("HISTORICAL_START", "2010-01-01")
+    FUNDAMENTAL_BOOTSTRAP_LIMIT: int | None = (
+        int(os.getenv("FUNDAMENTAL_BOOTSTRAP_LIMIT")) if os.getenv("FUNDAMENTAL_BOOTSTRAP_LIMIT") else None
+    )
 
 
 settings = Settings()

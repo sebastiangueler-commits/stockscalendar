@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -12,10 +12,23 @@ from backend.auth.security import hash_password, verify_password, create_access_
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login", auto_error=False)
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+def _extract_bearer_from_request(request: Request) -> str | None:
+    auth = request.headers.get("Authorization")
+    if auth and auth.lower().startswith("bearer "):
+        return auth.split(" ", 1)[1]
+    cookie = request.cookies.get("access_token")
+    if cookie and cookie.lower().startswith("bearer "):
+        return cookie.split(" ", 1)[1]
+    return None
+
+
+def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
+    token = _extract_bearer_from_request(request)
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     try:
         payload = decode_access_token(token)
         email = payload.get("sub")
@@ -27,6 +40,23 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="Inactive or missing user")
     return user
+
+
+def get_optional_user(request: Request, db: Session = Depends(get_db)) -> User | None:
+    try:
+        token = _extract_bearer_from_request(request)
+        if not token:
+            return None
+        payload = decode_access_token(token)
+        email = payload.get("sub")
+        if not email:
+            return None
+        user = db.query(User).filter(User.email == email).first()
+        if not user or not user.is_active:
+            return None
+        return user
+    except Exception:
+        return None
 
 
 def require_role(required: UserRole):
@@ -58,6 +88,6 @@ def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), 
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token(subject=user.email)
     # HttpOnly cookie for browser flows
-    response.set_cookie(key="access_token", value=f"Bearer {token}", httponly=True)
+    response.set_cookie(key="access_token", value=f"Bearer {token}", httponly=True, samesite="lax")
     return TokenOut(access_token=token)
 

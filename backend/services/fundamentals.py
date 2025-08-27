@@ -5,6 +5,7 @@ from typing import Dict, List
 import yfinance as yf
 
 from backend.services.market_data import list_default_symbols
+from backend.services.symbols import get_equity_symbols, get_commodity_symbols
 
 
 def _stock_fundamental_ok(t: yf.Ticker) -> Dict:
@@ -42,7 +43,7 @@ def _commodity_fundamental_ok(symbol: str) -> Dict:
 
 
 def build_fundamental_calendar(symbols: List[str] | None = None) -> Dict:
-    symbols = symbols or list_default_symbols()
+    symbols = symbols or (get_equity_symbols(limit=None) + get_commodity_symbols())
     items = []
     for sym in symbols:
         t = yf.Ticker(sym)

@@ -4,6 +4,7 @@ from typing import List, Dict
 import pandas as pd
 import yfinance as yf
 from backend.config import settings
+from backend.services.symbols import get_equity_symbols, get_commodity_symbols
 
 
 def fetch_price_history(symbol: str, start: str | None = None) -> pd.DataFrame:
@@ -15,10 +16,9 @@ def fetch_price_history(symbol: str, start: str | None = None) -> pd.DataFrame:
     return df[["Date", "Close"]]
 
 
-def list_default_symbols() -> List[str]:
-    # Minimal seed set; can be expanded with public symbol dumps
-    equities = ["AAPL", "MSFT", "AMZN", "NVDA", "GOOGL", "TSLA", "META"]
-    commodities = ["GC=F", "SI=F", "CL=F", "NG=F", "HG=F", "ZW=F", "ZC=F"]
+def list_default_symbols(limit_equities: int | None = 5000) -> List[str]:
+    equities = get_equity_symbols(limit=limit_equities)
+    commodities = get_commodity_symbols()
     return equities + commodities
 
 
