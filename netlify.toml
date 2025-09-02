@@ -6,8 +6,15 @@ publish = "build"
 [build.environment]
 CI = "false"
 GENERATE_SOURCEMAP = "false"
+NODE_VERSION = "18"
 
 # Netlify Functions
 [functions]
 directory = "netlify/functions"
 node_bundler = "esbuild"
+
+# Redirects for SPA
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
