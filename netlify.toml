@@ -8,9 +8,9 @@ CI = "false"
 GENERATE_SOURCEMAP = "false"
 NODE_VERSION = "18"
 
-# Netlify Functions
+# Netlify Functions - Moved to frontend directory
 [functions]
-directory = "../netlify/functions"
+directory = "functions"
 node_bundler = "esbuild"
 
 # Redirects for SPA
