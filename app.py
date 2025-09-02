@@ -34,7 +34,7 @@ app = FastAPI(title="Magic Stocks Calendar - REAL DATA", version="4.0.0")
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],  # Permitir todos los orígenes para desarrollo
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -1624,6 +1624,15 @@ async def get_stock_data(symbol: str):
         "data": data,
         "timestamp": datetime.now().isoformat()
     }
+
+# Endpoint de prueba
+@app.get("/")
+async def root():
+    return {"message": "Magic Stocks Calendar API is running!", "status": "ok"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 if __name__ == "__main__":
     logger.info("🎯 Magic Stocks Calendar - Sistema REAL con datos en vivo")
