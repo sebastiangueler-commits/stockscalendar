@@ -7,6 +7,6 @@ publish = "build"
 CI = "false"
 GENERATE_SOURCEMAP = "false"
 
-# Netlify Functions
+# Netlify Functions - Correct path
 [functions]
-directory = "frontend/functions"
+directory = "functions"
