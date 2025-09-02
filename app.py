@@ -9,7 +9,6 @@ import logging
 import time
 import requests
 import yfinance as yf
-import pandas as pd
 import numpy as np
 import random
 from datetime import datetime, timedelta
