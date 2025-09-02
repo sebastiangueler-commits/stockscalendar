@@ -7,10 +7,9 @@ CI = "false"
 GENERATE_SOURCEMAP = "false"
 NODE_VERSION = "18"
 
-# Netlify Functions
+# Netlify Functions - Simple configuration
 [functions]
 directory = "functions"
-node_bundler = "esbuild"
 
 # Redirects for SPA
 [[redirects]]
