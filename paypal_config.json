@@ -1,0 +1,8 @@
+{
+  "paypal_email": "malukelbasics@gmail.com",
+  "paypal_merchant_id": "tu-merchant-id",
+  "paypal_client_id": "Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6",
+  "paypal_secret": "EFQLJ1moTHjkB3PhZm3LFzTK9ixq3KWMlV9A9S_e1VKFXWJvFuWzrdOQrAn5z27a2t4Yx_xzgdzbrmoI",
+  "paypal_mode": "live",
+  "paypal_environment": "production"
+}

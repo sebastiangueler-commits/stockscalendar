@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "message": "Aplicación Magic Stocks Calendar completada exitosamente",
+  "total_stocks": 92,
+  "total_signals": 184,
+  "buy_signals": 23,
+  "sell_signals": 161,
+  "fundamental_signals": 92,
+  "technical_signals": 92,
+  "calendar_days": 30,
+  "last_update": "2025-09-01T20:03:38.804706",
+  "next_update": "2025-09-01T20:08:38.222233",
+  "apis_status": {
+    "alpha_vantage": "online",
+    "iex_cloud": "online",
+    "finnhub": "online",
+    "yahoo_finance": "offline"
+  }
+}
