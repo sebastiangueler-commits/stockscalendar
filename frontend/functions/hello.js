@@ -1,3 +1,4 @@
+// Test function for Netlify Functions - v2
 exports.handler = async (event, context) => {
   return {
     statusCode: 200,
@@ -7,7 +8,8 @@ exports.handler = async (event, context) => {
     },
     body: JSON.stringify({
       message: 'Hello from Netlify Functions!',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      version: '2.0'
     })
   };
 };
