@@ -6,3 +6,7 @@ publish = "build"
 [build.environment]
 CI = "false"
 GENERATE_SOURCEMAP = "false"
+
+# Netlify Functions
+[functions]
+directory = "frontend/functions"
