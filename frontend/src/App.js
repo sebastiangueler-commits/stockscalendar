@@ -7,15 +7,15 @@ import RealCalendar from './components/RealCalendar';
 import MonthlyCalendar from './components/MonthlyCalendar';
 import AdminDashboard from './components/AdminDashboard';
 
-// API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://stockscalendar-1.onrender.com';
+// API Configuration - Netlify Functions
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 // Professional API Service
 const apiService = {
   // Authentication
   login: async (credentials) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`/.netlify/functions/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -36,14 +36,14 @@ const apiService = {
   // Calendar Data
   getCalendarData: async (calendarType) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/calendar/${calendarType}`);
+      const response = await fetch(`/.netlify/functions/calendar?period=${calendarType}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch ${calendarType} calendar`);
       }
       
       const data = await response.json();
-      return { success: true, data };
+      return { success: true, data: data.data };
     } catch (error) {
       console.error(`Error fetching ${calendarType} calendar:`, error);
       return { success: false, data: [], message: error.message };
@@ -70,7 +70,7 @@ const apiService = {
   // System Status
   getSystemStatus: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/status`);
+      const response = await fetch(`/.netlify/functions/status`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch system status');
@@ -195,7 +195,7 @@ const apiService = {
   // Create Payment
   createPayment: async (paymentData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/payment/create`, {
+      const response = await fetch(`/.netlify/functions/payment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(paymentData),
