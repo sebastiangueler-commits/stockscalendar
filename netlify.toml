@@ -10,3 +10,4 @@ GENERATE_SOURCEMAP = "false"
 # Netlify Functions
 [functions]
 directory = "netlify/functions"
+node_bundler = "esbuild"
