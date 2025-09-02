@@ -1238,7 +1238,7 @@ If you have issues, contact via WhatsApp or email.`);
                       </li>
                     ))}
                   </ul>
-                                    <button
+                  <button
                     onClick={() => handlePayment(plan)}
                     className={`w-full py-3 px-6 rounded-lg font-bold transition-colors ${
                       plan.id === 'lifetime'
