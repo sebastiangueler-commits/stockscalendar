@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
             const signalTypes = ["BUY", "SELL", "HOLD"];
             const signalType = signalTypes[Math.floor(Math.random() * signalTypes.length)];
 
-            const companies = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"];
+            const companies = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "META", "NVDA", "NFLX"];
             const company = companies[Math.floor(Math.random() * companies.length)];
 
             signals.push({
@@ -76,6 +76,7 @@ exports.handler = async (event, context) => {
 
     const calendarData = generateCalendarData();
 
+    // Devolver la estructura exacta que espera el frontend
     return {
       statusCode: 200,
       headers,
