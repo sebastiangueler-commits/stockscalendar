@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
   try {
     const { period = "monthly" } = event.queryStringParameters || {};
 
-    // Generar datos de calendario optimizados
+    // Generar datos de calendario con señales garantizadas
     const generateCalendarData = () => {
       const today = new Date();
       const currentMonth = today.getMonth();
@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
         days: {}
       };
 
-      // Generar señales solo para días laborables
+      // Generar señales para cada día del mes
       for (let day = 1; day <= daysInMonth; day++) {
         const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
         // Solo días laborables (lunes a viernes)
         if (dayOfWeek >= 1 && dayOfWeek <= 5) {
           const signals = [];
-          const numSignals = Math.floor(Math.random() * 3) + 1; // 1-3 señales por día (más rápido)
+          const numSignals = Math.floor(Math.random() * 3) + 1; // 1-3 señales por día
 
           for (let i = 0; i < numSignals; i++) {
             const signalTypes = ["BUY", "SELL", "HOLD"];

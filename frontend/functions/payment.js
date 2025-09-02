@@ -63,8 +63,8 @@ exports.handler = async (event, context) => {
     // Generar enlace de PayPal
     const payment_id = `pay_${Date.now()}`;
 
-    // URL de PayPal para pagos reales - formato correcto
-    const paypal_url = `https://www.paypal.com/paypalme/malukelbasics@gmail.com/${plan.price}USD`;
+    // URL de PayPal simplificada y confiable
+    const paypal_url = `https://www.paypal.com/paypalme/malukelbasics@gmail.com?amount=${plan.price}`;
 
     return {
       statusCode: 200,
