@@ -8,7 +8,7 @@ import MonthlyCalendar from './components/MonthlyCalendar';
 import AdminDashboard from './components/AdminDashboard';
 
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://tu-app.vercel.app';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://tu-app.onrender.com';
 
 // Professional API Service
 const apiService = {
