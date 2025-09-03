@@ -66,8 +66,8 @@ exports.handler = async (event, context) => {
     // URL de PayPal simplificada y confiable
     const paypal_url = `https://www.paypal.me/malukelbasics/${plan.price}`;
 
-    // URL alternativa de Stripe (más confiable)
-    const stripe_url = `https://buy.stripe.com/test_28o5kK0Xj0Xj0Xj6op?prefilled_email=${user_id}@example.com&client_reference_id=${payment_id}`;
+    // URL de Stripe más simple y confiable
+    const stripe_url = `https://buy.stripe.com/test_28o5kK0Xj0Xj0Xj6op?prefilled_email=${user_id}@example.com&client_reference_id=${payment_id}&amount=${plan.price * 100}`;
 
     return {
       statusCode: 200,

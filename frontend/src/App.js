@@ -15,18 +15,22 @@ const apiService = {
   // Authentication
   login: async (credentials) => {
     try {
+      console.log('Attempting login with:', credentials);
       const response = await fetch(`/.netlify/functions/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
       
+      console.log('Login response status:', response.status);
+      const data = await response.json();
+      console.log('Login response data:', data);
+      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Login failed');
+        throw new Error(data.message || 'Login failed');
       }
       
-      return await response.json();
+      return data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;

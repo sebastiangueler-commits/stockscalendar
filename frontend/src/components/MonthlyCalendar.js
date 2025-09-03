@@ -66,6 +66,8 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
     }
   };
 
+  console.log('MonthlyCalendar received calendarData:', calendarData);
+  
   if (!calendarData) {
     return (
       <div className="text-center py-12">
