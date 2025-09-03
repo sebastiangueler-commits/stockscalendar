@@ -42,13 +42,13 @@ exports.handler = async (event, context) => {
         // Solo días laborables (lunes a viernes)
         if (dayOfWeek >= 1 && dayOfWeek <= 5) {
           const signals = [];
-          const numSignals = Math.floor(Math.random() * 3) + 1; // 1-3 señales por día
+          const numSignals = Math.floor(Math.random() * 3) + 2; // 2-4 señales por día (mínimo 2)
 
           for (let i = 0; i < numSignals; i++) {
             const signalTypes = ["BUY", "SELL", "HOLD"];
             const signalType = signalTypes[Math.floor(Math.random() * signalTypes.length)];
 
-            const companies = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "META", "NVDA", "NFLX"];
+            const companies = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "META", "NVDA", "NFLX", "SPY", "QQQ"];
             const company = companies[Math.floor(Math.random() * companies.length)];
 
             signals.push({

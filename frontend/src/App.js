@@ -1030,6 +1030,7 @@ If you have issues, contact via WhatsApp or email.`);
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           {activeTab === 'monthly' ? (
             <MonthlyCalendar 
+              calendarData={calendarData}
               onSignalClick={(signal) => {
                 console.log('Signal clicked:', signal);
                 // Aquí puedes agregar lógica para mostrar detalles de la señal
