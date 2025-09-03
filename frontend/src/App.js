@@ -433,7 +433,7 @@ function App() {
                 </a>
                 
                 <a href="${result.paypal_url}" target="_blank" style="
-                  display: inline-block; background: #0070ba; color: white; 
+              display: inline-block; background: #0070ba; color: white; 
                   padding: 18px 30px; text-decoration: none; border-radius: 8px;
                   font-weight: bold; font-size: 18px; transition: all 0.3s;">
                   💳 Pay with PayPal - $${amount}

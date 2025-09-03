@@ -2,21 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/build/**",
-      "use": "@vercel/static"
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/frontend/build/static/$1"
+      "src": "/api/(.*)",
+      "dest": "https://magic-stocks-backend.railway.app/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/build/index.html"
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "https://your-backend-url.herokuapp.com"
-  }
+  ]
 }

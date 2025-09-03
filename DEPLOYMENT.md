@@ -1,253 +1,159 @@
-# 🚀 Deployment Guide - Magic Stocks Calendar
+# 🚀 Magic Stocks Calendar - Deployment Guide
 
-## 📋 Prerequisites
+## 📋 Resumen del Proyecto
 
-1. **Git** installed and configured
-2. **Node.js 16+** installed
-3. **Python 3.8+** installed
-4. **Vercel CLI** installed (`npm i -g vercel`)
-5. **Heroku CLI** installed
-6. **GitHub account** for repository hosting
+**Magic Stocks Calendar** es una aplicación de análisis de acciones con:
+- ✅ Backend: FastAPI (Python)
+- ✅ Frontend: React + Tailwind CSS
+- ✅ APIs: Alpha Vantage, Yahoo Finance, IEX Cloud
+- ✅ Pagos: PayPal integrado
+- ✅ Datos: 5000+ acciones reales analizadas
 
-## 🌐 Frontend Deployment (Vercel)
+## 🌐 Deployment Options
 
-### Step 1: Prepare Repository
-```bash
-# Initialize git repository
-git init
-git add .
-git commit -m "Initial commit"
+### Opción 1: Railway (Backend) + Vercel (Frontend) - RECOMENDADO
 
-# Create GitHub repository and push
-git remote add origin https://github.com/yourusername/magic-stocks-calendar.git
-git push -u origin main
-```
+#### Backend en Railway:
+1. **Crear cuenta en Railway**: https://railway.app
+2. **Conectar GitHub**: Conecta tu repositorio
+3. **Deploy automático**: Railway detectará el `railway.json`
+4. **Variables de entorno**:
+   ```
+   ALPHA_VANTAGE_API_KEY=demo
+   IEX_CLOUD_API_KEY=Tpk_018b97bce0a24c0d9c632c01c3c7c5c8
+   FINNHUB_API_KEY=demo
+   PAYPAL_CLIENT_ID=Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6
+   PAYPAL_CLIENT_SECRET=EFQLJ1moTHjkB3PhZm3LFzTK9ixq3KWMlV9A9S_e1VKFXWJvFuWzrdOQrAn5z27a2t4Yx_xzgdzbrmoI
+   PAYPAL_MODE=live
+   PAYPAL_EMAIL=malukelbasics@gmail.com
+   ```
 
-### Step 2: Deploy to Vercel
-```bash
-# Install Vercel CLI
-npm i -g vercel
+#### Frontend en Vercel:
+1. **Crear cuenta en Vercel**: https://vercel.com
+2. **Importar proyecto**: Conecta tu repositorio
+3. **Configurar build**:
+   - Build Command: `cd frontend && npm install && npm run build`
+   - Output Directory: `frontend/build`
+4. **Variables de entorno**:
+   ```
+   REACT_APP_API_URL=https://tu-backend.railway.app
+   REACT_APP_PAYPAL_CLIENT_ID=Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6
+   ```
 
-# Login to Vercel
-vercel login
+### Opción 2: Railway (Backend) + Netlify (Frontend)
 
-# Deploy from project root
-vercel
+#### Backend en Railway:
+- Mismo proceso que Opción 1
 
-# Follow prompts:
-# - Set up and deploy? Y
-# - Which scope? (select your account)
-# - Link to existing project? N
-# - Project name: magic-stocks-calendar
-# - Directory: ./frontend/build
-# - Override settings? N
-```
+#### Frontend en Netlify:
+1. **Crear cuenta en Netlify**: https://netlify.com
+2. **Conectar GitHub**: Conecta tu repositorio
+3. **Configurar build**:
+   - Build Command: `cd frontend && npm install && npm run build`
+   - Publish Directory: `frontend/build`
+4. **Variables de entorno**:
+   ```
+   REACT_APP_API_URL=https://tu-backend.railway.app
+   REACT_APP_PAYPAL_CLIENT_ID=Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6
+   ```
 
-### Step 3: Configure Environment Variables
-In Vercel dashboard:
-1. Go to your project settings
-2. Add environment variable:
-   - `REACT_APP_API_URL` = `https://your-backend-url.herokuapp.com`
+### Opción 3: Heroku (Backend) + Vercel (Frontend)
 
-## 🔧 Backend Deployment (Heroku)
+#### Backend en Heroku:
+1. **Crear cuenta en Heroku**: https://heroku.com
+2. **Instalar Heroku CLI**
+3. **Deploy**:
+   ```bash
+   heroku create magic-stocks-backend
+   git push heroku main
+   ```
+4. **Variables de entorno**:
+   ```bash
+   heroku config:set ALPHA_VANTAGE_API_KEY=demo
+   heroku config:set PAYPAL_CLIENT_ID=Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6
+   # ... etc
+   ```
 
-### Step 1: Prepare Backend
-```bash
-# Create requirements.txt if not exists
-pip freeze > requirements.txt
+## 🔧 Configuración Post-Deployment
 
-# Create Procfile
-echo "web: python app.py" > Procfile
+### 1. Actualizar URLs en el Frontend
+Después del deployment, actualiza las URLs en:
+- `netlify.toml` (línea 8)
+- `vercel.json` (línea 12)
+- Variables de entorno del frontend
 
-# Create runtime.txt
-echo "python-3.9.18" > runtime.txt
-```
+### 2. Configurar PayPal
+- ✅ PayPal ya está configurado con tus credenciales
+- ✅ Modo: `live` (producción)
+- ✅ Email: `malukelbasics@gmail.com`
 
-### Step 2: Deploy to Heroku
-```bash
-# Login to Heroku
-heroku login
+### 3. Dominio Personalizado (Opcional)
+- **Railway**: Configura dominio personalizado en el dashboard
+- **Vercel/Netlify**: Configura dominio en las configuraciones del proyecto
 
-# Create Heroku app
-heroku create magic-stocks-backend
+## 📊 Monitoreo y Mantenimiento
 
-# Add Python buildpack
-heroku buildpacks:set heroku/python
+### Health Checks:
+- Backend: `https://tu-backend.railway.app/health`
+- Frontend: Verifica que cargue correctamente
 
-# Deploy
-git add .
-git commit -m "Deploy backend"
-git push heroku main
-```
+### Logs:
+- **Railway**: Dashboard → Logs
+- **Vercel**: Dashboard → Functions → Logs
+- **Netlify**: Dashboard → Functions → Logs
 
-### Step 3: Configure Environment Variables
-```bash
-# Set environment variables
-heroku config:set API_BASE_URL=https://magic-stocks-backend.herokuapp.com
-heroku config:set PYTHONPATH=/app
-```
-
-## 🔄 Automated Deployment
-
-### Using the Deploy Script
-```bash
-# Make script executable
-chmod +x deploy.sh
-
-# Run deployment
-./deploy.sh
-```
-
-### GitHub Actions (Optional)
-Create `.github/workflows/deploy.yml`:
-```yaml
-name: Deploy to Production
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy-frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm install
-      - name: Build
-        run: |
-          cd frontend
-          npm run build
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.ORG_ID }}
-          vercel-project-id: ${{ secrets.PROJECT_ID }}
-          working-directory: ./frontend
-
-  deploy-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "magic-stocks-backend"
-          heroku_email: "your-email@example.com"
-```
-
-## 🔧 Configuration
-
-### Frontend Environment Variables
-```bash
-REACT_APP_API_URL=https://your-backend-url.herokuapp.com
-REACT_APP_PAYPAL_EMAIL=malukelbasics@gmail.com
-```
-
-### Backend Environment Variables
-```bash
-API_BASE_URL=https://your-backend-url.herokuapp.com
-PYTHONPATH=/app
-PORT=8001
-```
-
-## 📊 Monitoring
-
-### Vercel Analytics
-- Enable in Vercel dashboard
-- Monitor performance and user behavior
-- Track conversion rates
-
-### Heroku Monitoring
-```bash
-# View logs
-heroku logs --tail
-
-# Monitor performance
-heroku ps:scale web=1
-
-# Check app status
-heroku ps
-```
-
-## 🔒 Security
-
-### SSL Certificates
-- Vercel provides automatic SSL
-- Heroku provides automatic SSL
-- Both use Let's Encrypt
-
-### Environment Variables
-- Never commit sensitive data
-- Use platform-specific secret management
-- Rotate keys regularly
-
-## 📈 Performance Optimization
-
-### Frontend
-- Enable Vercel's Edge Network
-- Use CDN for static assets
-- Implement lazy loading
-- Optimize images
-
-### Backend
-- Use Heroku's performance dynos
-- Implement caching
-- Database connection pooling
-- API rate limiting
+### Actualizaciones:
+- **Automáticas**: Cada push a `main` deploya automáticamente
+- **Manuales**: Usa los dashboards de cada plataforma
 
 ## 🚨 Troubleshooting
 
-### Common Issues
+### Backend no responde:
+1. Verifica variables de entorno
+2. Revisa logs en Railway/Heroku
+3. Verifica que el puerto sea `$PORT`
 
-1. **Build Failures**
-   ```bash
-   # Check Node.js version
-   node --version
-   
-   # Clear npm cache
-   npm cache clean --force
-   
-   # Reinstall dependencies
-   rm -rf node_modules package-lock.json
-   npm install
-   ```
+### Frontend no conecta al backend:
+1. Verifica `REACT_APP_API_URL`
+2. Revisa CORS en el backend
+3. Verifica que las funciones de Netlify estén funcionando
 
-2. **Backend Deployment Issues**
-   ```bash
-   # Check Python version
-   python --version
-   
-   # Verify requirements.txt
-   pip install -r requirements.txt
-   
-   # Check Heroku logs
-   heroku logs --tail
-   ```
+### PayPal no funciona:
+1. Verifica credenciales en variables de entorno
+2. Confirma que esté en modo `live`
+3. Revisa logs de pago
 
-3. **Environment Variables**
-   ```bash
-   # Verify Vercel env vars
-   vercel env ls
-   
-   # Verify Heroku env vars
-   heroku config
-   ```
+## 💰 Costos Estimados
 
-## 📞 Support
+### Railway:
+- **Gratis**: 500 horas/mes
+- **Pro**: $5/mes por servicio
 
-- **Vercel Support**: https://vercel.com/support
-- **Heroku Support**: https://help.heroku.com
-- **Documentation**: See README.md
+### Vercel:
+- **Gratis**: 100GB bandwidth/mes
+- **Pro**: $20/mes
+
+### Netlify:
+- **Gratis**: 100GB bandwidth/mes
+- **Pro**: $19/mes
+
+## 🎯 Próximos Pasos
+
+1. **Deploy Backend** en Railway
+2. **Deploy Frontend** en Vercel/Netlify
+3. **Configurar variables de entorno**
+4. **Probar funcionalidad completa**
+5. **Configurar dominio personalizado** (opcional)
+6. **Monitorear performance**
+
+## 📞 Soporte
+
+Si tienes problemas:
+1. Revisa los logs en cada plataforma
+2. Verifica las variables de entorno
+3. Confirma que las URLs estén correctas
+4. Contacta soporte de la plataforma si es necesario
 
 ---
 
-**Ready to deploy!** 🚀 Your Magic Stocks Calendar will be live and ready to generate revenue!
+**¡Tu aplicación estará online en menos de 30 minutos!** 🚀

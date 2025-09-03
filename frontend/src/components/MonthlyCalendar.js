@@ -76,7 +76,7 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
       onSignalClick(signal);
     }
   };
-  
+
   if (!calendarData) {
     return (
       <div className="text-center py-12">
@@ -93,7 +93,7 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
         <div className="flex items-center space-x-3">
           <Calendar className="h-6 w-6 text-blue-500" />
           <h2 className="text-xl font-bold text-white">Monthly Calendar</h2>
-        </div>
+            </div>
         <div className="text-right">
           <p className="text-sm text-gray-400">Total Signals</p>
           <p className="text-2xl font-bold text-blue-500">{calendarData.total_signals || 0}</p>
@@ -101,23 +101,23 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-2">
         {/* Day Headers */}
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
           <div key={day} className="text-center py-2 text-sm font-medium text-gray-400">
-            {day}
-          </div>
-        ))}
+              {day}
+            </div>
+          ))}
 
         {/* Calendar Days */}
         {days.map((day) => {
           const dayData = calendarData.days?.[day.fullDate];
-          const hasSignals = dayData && dayData.signals && dayData.signals.length > 0;
+            const hasSignals = dayData && dayData.signals && dayData.signals.length > 0;
           const isToday = day.fullDate === new Date().toISOString().split('T')[0];
           const isWeekend = day.date.getDay() === 0 || day.date.getDay() === 6;
 
-          return (
-            <div
+            return (
+              <div
               key={day.fullDate}
               onClick={() => !isWeekend && handleDayClick(day)}
               className={`
@@ -133,8 +133,8 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
               {hasSignals && !isWeekend && (
                 <div className="absolute -top-1 -right-1">
                   <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                </div>
-              )}
+                      </div>
+                    )}
               
               {/* Signal Count */}
               {hasSignals && !isWeekend && (
@@ -142,11 +142,11 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
                   <span className="text-xs bg-red-500 text-white px-1 rounded-full">
                     {dayData.signals.length}
                   </span>
-                </div>
-              )}
-            </div>
-          );
-        })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
       </div>
 
       {/* Selected Day Signals */}
@@ -157,7 +157,7 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
           </h3>
           
           {getDaySignals().length > 0 ? (
-            <div className="space-y-3">
+              <div className="space-y-3">
               {getDaySignals().map((signal) => (
                 <div
                   key={signal.id}
@@ -170,16 +170,16 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
                       <span className="font-medium text-white">{signal.company}</span>
                       <span className={`text-sm font-medium ${getSignalColor(signal.signal)}`}>
                         {signal.signal}
-                      </span>
-                    </div>
+                  </span>
+                </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-400">Confidence</p>
                       <p className={`text-sm font-medium ${getConfidenceColor(signal.confidence)}`}>
                         {signal.confidence}%
                       </p>
-                    </div>
-                  </div>
-                  
+              </div>
+            </div>
+            
                   <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
                     <div>
                       <span className="text-gray-400">Price:</span>
@@ -191,14 +191,14 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
                         {signal.change}%
                       </span>
                     </div>
-                    <div>
+            <div>
                       <span className="text-gray-400">Volume:</span>
                       <span className="text-white ml-1">{(signal.volume / 1000).toFixed(0)}K</span>
-                    </div>
-                  </div>
                 </div>
-              ))}
+              </div>
             </div>
+              ))}
+          </div>
           ) : (
             <p className="text-gray-400 text-center py-4">No signals for this day</p>
           )}
@@ -231,22 +231,22 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
               <div>
                 <span className="text-gray-400">Price:</span>
                 <span className="text-white ml-2">${selectedSignal.price}</span>
-              </div>
+          </div>
               <div>
                 <span className="text-gray-400">Change:</span>
                 <span className={`ml-2 ${parseFloat(selectedSignal.change) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {selectedSignal.change}%
                 </span>
-              </div>
+          </div>
               <div>
                 <span className="text-gray-400">Volume:</span>
                 <span className="text-white ml-2">{(selectedSignal.volume / 1000).toFixed(0)}K</span>
-              </div>
+          </div>
               <div>
                 <span className="text-gray-400">Time:</span>
                 <span className="text-white ml-2">{new Date(selectedSignal.timestamp).toLocaleString()}</span>
-              </div>
-            </div>
+          </div>
+        </div>
             
             <button
               onClick={() => setSelectedSignal(null)}
@@ -254,7 +254,7 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
             >
               Close
             </button>
-          </div>
+      </div>
         </div>
       )}
     </div>

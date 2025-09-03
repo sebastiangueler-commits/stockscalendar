@@ -1,66 +1,86 @@
-exports.handler = async (event, context) => {
-  // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
-  };
+const fetch = require('node-fetch');
 
-  // Handle preflight requests
+exports.handler = async (event, context) => {
+  // Handle CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
       body: ''
     };
   }
 
-  // Simple demo login
-  if (event.httpMethod === 'POST') {
-    try {
-      const { username, password } = JSON.parse(event.body);
-      
-      if (username === 'demo' && password === 'demo123') {
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({
-            success: true,
-            token: `token_${username}_${Date.now()}`,
-            user: {
-              username: username,
-              email: 'demo@magicstocks.com',
-              role: 'user',
-              plan: 'premium'
-            },
-            message: 'Login exitoso'
-          })
-        };
-      } else {
-        return {
-          statusCode: 401,
-          headers,
-          body: JSON.stringify({
-            success: false,
-            message: 'Credenciales inválidas'
-          })
-        };
-      }
-    } catch (error) {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
+  }
+
+  try {
+    const { username, password } = JSON.parse(event.body);
+    
+    // Demo login for testing
+    if (username === 'demo' && password === 'demo123') {
       return {
-        statusCode: 500,
-        headers,
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-          success: false,
-          message: 'Error en login'
+          success: true,
+          token: `token_${username}_${Date.now()}`,
+          user: {
+            username: username,
+            email: 'demo@magicstocks.com',
+            role: 'user',
+            plan: 'premium'
+          },
+          message: 'Login exitoso'
         })
       };
     }
-  }
 
-  return {
-    statusCode: 405,
-    headers,
-    body: JSON.stringify({ error: 'Method not allowed' })
-  };
+    // Forward to backend API
+    const backendUrl = process.env.REACT_APP_API_URL || 'https://magic-stocks-backend.railway.app';
+    const response = await fetch(`${backendUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+
+    return {
+      statusCode: response.status,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
+
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        success: false,
+        message: 'Error en login: ' + error.message
+      })
+    };
+  }
 };

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ALPHA_VANTAGE_API_KEY=demo
+      - IEX_CLOUD_API_KEY=Tpk_018b97bce0a24c0d9c632c01c3c7c5c8
+      - FINNHUB_API_KEY=demo
+      - PAYPAL_CLIENT_ID=Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6
+      - PAYPAL_CLIENT_SECRET=EFQLJ1moTHjkB3PhZm3LFzTK9ixq3KWMlV9A9S_e1VKFXWJvFuWzrdOQrAn5z27a2t4Yx_xzgdzbrmoI
+      - PAYPAL_MODE=live
+      - PAYPAL_EMAIL=malukelbasics@gmail.com
+    volumes:
+      - ./fundamental_signals.json:/app/fundamental_signals.json
+      - ./technical_signals.json:/app/technical_signals.json
+      - ./complete_calendar_data.json:/app/complete_calendar_data.json
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_PAYPAL_CLIENT_ID=Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6
+    depends_on:
+      - backend
+    restart: unless-stopped
