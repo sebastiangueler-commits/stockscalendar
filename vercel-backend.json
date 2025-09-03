@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/health",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/",
+      "dest": "/api/index.py"
+    }
+  ],
+  "env": {
+    "PAYPAL_CLIENT_ID": "Af3gNb8926-JQj_yhlkytxhRb2k6IigPrzQoAwa9ifawMixPM5aS8t2IuaJ0aJA0eLTVFVrSTdE3d_Y6",
+    "PAYPAL_CLIENT_SECRET": "EFQLJ1moTHjkB3PhZm3LFzTK9ixq3KWMlV9A9S_e1VKFXWJvFuWzrdOQrAn5z27a2t4Yx_xzgdzbrmoI",
+    "PAYPAL_MODE": "live",
+    "PAYPAL_EMAIL": "malukelbasics@gmail.com"
+  }
+}
