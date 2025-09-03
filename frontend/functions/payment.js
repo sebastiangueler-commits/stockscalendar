@@ -24,6 +24,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('Payment function called with body:', event.body);
     const { plan_id, user_id } = JSON.parse(event.body);
 
     // Planes de pago
@@ -56,18 +57,22 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 404,
         headers,
-        body: JSON.stringify({ success: false, error: "Plan no encontrado" })
+        body: JSON.stringify({ success: false, error: "Plan not found" })
       };
     }
+
+    console.log('Processing payment for plan:', plan);
 
     // Generar enlace de pago
     const payment_id = `pay_${Date.now()}`;
 
-    // URL de PayPal simplificada y confiable
-    const paypal_url = `https://www.paypal.me/malukelbasics/${plan.price}`;
+    // URL de PayPal corregida - usar el formato correcto
+    const paypal_url = `https://www.paypal.com/paypalme/malukelbasics/${plan.price}USD`;
 
-    // URL de Stripe más simple y confiable
-    const stripe_url = `https://buy.stripe.com/test_28o5kK0Xj0Xj0Xj6op?prefilled_email=${user_id}@example.com&client_reference_id=${payment_id}&amount=${plan.price * 100}`;
+    // URL de Stripe corregida - usar un link de prueba más simple
+    const stripe_url = `https://buy.stripe.com/test_28o5kK0Xj0Xj0Xj6op?prefilled_email=${user_id}@example.com&client_reference_id=${payment_id}`;
+
+    console.log('Generated payment URLs:', { paypal_url, stripe_url });
 
     return {
       statusCode: 200,
@@ -85,12 +90,13 @@ exports.handler = async (event, context) => {
       })
     };
   } catch (error) {
+    console.error('Payment function error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: `Error en pago: ${error.message}`
+        error: `Payment error: ${error.message}`
       })
     };
   }

@@ -40,6 +40,7 @@ const apiService = {
   // Calendar Data
   getCalendarData: async (calendarType) => {
     try {
+      console.log('Fetching calendar data for:', calendarType);
       const response = await fetch(`/.netlify/functions/calendar?period=${calendarType}`);
       
       if (!response.ok) {
@@ -47,7 +48,14 @@ const apiService = {
       }
       
       const data = await response.json();
-      return { success: true, data: data.data };
+      console.log('Calendar API response:', data);
+      
+      if (data.success && data.data) {
+        return { success: true, data: data.data };
+      } else {
+        console.error('Calendar API returned error:', data);
+        return { success: false, data: [], message: data.error || 'Unknown error' };
+      }
     } catch (error) {
       console.error(`Error fetching ${calendarType} calendar:`, error);
       return { success: false, data: [], message: error.message };

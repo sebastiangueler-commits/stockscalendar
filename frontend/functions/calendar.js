@@ -34,12 +34,11 @@ exports.handler = async (event, context) => {
 
       console.log(`Generating calendar for ${currentYear}-${currentMonth + 1} with ${daysInMonth} days`);
 
-      // Generar señales para cada día del mes
+      // Generar señales para TODOS los días (no solo laborables)
       for (let day = 1; day <= daysInMonth; day++) {
         const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
 
-        // Generar señales para TODOS los días (no solo laborables)
         const signals = [];
         const numSignals = Math.floor(Math.random() * 3) + 2; // 2-4 señales por día (mínimo 2)
 
@@ -73,6 +72,7 @@ exports.handler = async (event, context) => {
       }
 
       console.log(`Generated ${calendarData.total_signals} total signals`);
+      console.log('Sample day data:', Object.keys(calendarData.days)[0], calendarData.days[Object.keys(calendarData.days)[0]]);
       return calendarData;
     };
 

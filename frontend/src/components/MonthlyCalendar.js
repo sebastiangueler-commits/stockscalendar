@@ -5,6 +5,11 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSignal, setSelectedSignal] = useState(null);
 
+  console.log('MonthlyCalendar received calendarData:', calendarData);
+  console.log('CalendarData type:', typeof calendarData);
+  console.log('CalendarData keys:', calendarData ? Object.keys(calendarData) : 'null');
+  console.log('CalendarData days:', calendarData?.days ? Object.keys(calendarData.days) : 'no days');
+
   // Generar días del mes actual
   const generateDays = () => {
     const days = [];
@@ -32,6 +37,7 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
   };
 
   const days = generateDays();
+  console.log('Generated days:', days.length, 'days');
 
   const getSignalColor = (type) => {
     return type === 'BUY' ? 'text-green-400' : type === 'SELL' ? 'text-red-400' : 'text-yellow-400';
@@ -48,14 +54,19 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
   };
 
   const handleDayClick = (day) => {
+    console.log('Day clicked:', day.fullDate);
     setSelectedDate(day.fullDate);
     setSelectedSignal(null);
   };
 
   // Obtener todas las señales del día seleccionado
   const getDaySignals = () => {
-    if (!selectedDate || !calendarData || !calendarData.days) return [];
+    if (!selectedDate || !calendarData || !calendarData.days) {
+      console.log('No signals available for:', selectedDate);
+      return [];
+    }
     const dayData = calendarData.days[selectedDate];
+    console.log('Day data for', selectedDate, ':', dayData);
     return dayData ? dayData.signals : [];
   };
 
@@ -65,8 +76,6 @@ const MonthlyCalendar = ({ calendarData, onSignalClick }) => {
       onSignalClick(signal);
     }
   };
-
-  console.log('MonthlyCalendar received calendarData:', calendarData);
   
   if (!calendarData) {
     return (
