@@ -60,11 +60,14 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Generar enlace de PayPal
+    // Generar enlace de pago
     const payment_id = `pay_${Date.now()}`;
 
-    // URL de PayPal simplificada y confiable
-    const paypal_url = `https://www.paypal.com/paypalme/malukelbasics@gmail.com?amount=${plan.price}`;
+    // URL de Stripe (más confiable que PayPal)
+    const stripe_url = `https://buy.stripe.com/test_28o5kK0Xj0Xj0Xj6op?prefilled_email=${user_id}@example.com&client_reference_id=${payment_id}`;
+
+    // URL alternativa de PayPal (formato más simple)
+    const paypal_url = `https://www.paypal.me/malukelbasics/${plan.price}`;
 
     return {
       statusCode: 200,
@@ -76,8 +79,9 @@ exports.handler = async (event, context) => {
         user_id: user_id,
         status: "pending",
         amount: plan.price,
+        stripe_url: stripe_url,
         paypal_url: paypal_url,
-        message: "Redirigiendo a PayPal para completar el pago"
+        message: "Choose your payment method: Stripe (recommended) or PayPal"
       })
     };
   } catch (error) {

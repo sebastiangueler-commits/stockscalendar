@@ -354,7 +354,7 @@ function App() {
         // URL de PayPal con parámetros más específicos
         const paypalUrl = `https://www.paypal.com/paypalme/${paypalEmail}/${amount}?note=${encodeURIComponent(note)}`;
         
-        // Crear modal de pago más profesional
+        // Crear modal de pago con Stripe y PayPal
         const paymentModal = document.createElement('div');
         paymentModal.innerHTML = `
           <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -378,7 +378,7 @@ function App() {
                   Magic Stocks Calendar
                 </h2>
                 <p style="color: #666; margin: 0; font-size: 16px;">
-                  Complete your subscription to access all signals
+                  Choose your payment method
                 </p>
               </div>
               
@@ -397,7 +397,7 @@ function App() {
                   </span>
                 </div>
                 <div style="color: #666; font-size: 14px;">
-                  Secure payment processed by PayPal
+                  Secure payment processed by Stripe & PayPal
                 </div>
               </div>
               
@@ -413,29 +413,19 @@ function App() {
               
               <!-- Payment Buttons -->
               <div style="display: flex; flex-direction: column; gap: 15px;">
-            <a href="${paypalUrl}" target="_blank" style="
-              display: inline-block; background: #0070ba; color: white; 
+                <a href="${result.stripe_url}" target="_blank" style="
+                  display: inline-block; background: #6772e5; color: white; 
+                  padding: 18px 30px; text-decoration: none; border-radius: 8px;
+                  font-weight: bold; font-size: 18px; transition: all 0.3s;">
+                  💳 Pay with Stripe (Recommended) - $${amount}
+                </a>
+                
+                <a href="${result.paypal_url}" target="_blank" style="
+                  display: inline-block; background: #0070ba; color: white; 
                   padding: 18px 30px; text-decoration: none; border-radius: 8px;
                   font-weight: bold; font-size: 18px; transition: all 0.3s;">
                   💳 Pay with PayPal - $${amount}
                 </a>
-                
-            <button onclick="
-              const iframe = document.createElement('iframe');
-              iframe.src = '${paypalUrl}';
-              iframe.style.width = '100%';
-                  iframe.style.height = '600px';
-              iframe.style.border = 'none';
-                  iframe.style.borderRadius = '8px';
-                  iframe.style.marginTop = '20px';
-              this.parentElement.appendChild(iframe);
-              this.style.display = 'none';
-            " style="
-                  background: #28a745; color: white; padding: 15px 25px; 
-                  border: none; border-radius: 8px; cursor: pointer; 
-                  font-weight: bold; font-size: 16px;">
-                  📱 Open PayPal Here
-            </button>
               </div>
               
               <!-- Mobile Options -->

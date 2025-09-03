@@ -17,6 +17,7 @@ exports.handler = async (event, context) => {
 
   try {
     const { period = "monthly" } = event.queryStringParameters || {};
+    console.log('Calendar function called with period:', period);
 
     // Generar datos de calendario con señales garantizadas
     const generateCalendarData = () => {
@@ -30,6 +31,8 @@ exports.handler = async (event, context) => {
         total_signals: 0,
         days: {}
       };
+
+      console.log(`Generating calendar for ${currentYear}-${currentMonth + 1} with ${daysInMonth} days`);
 
       // Generar señales para cada día del mes
       for (let day = 1; day <= daysInMonth; day++) {
@@ -71,6 +74,7 @@ exports.handler = async (event, context) => {
         }
       }
 
+      console.log(`Generated ${calendarData.total_signals} total signals`);
       return calendarData;
     };
 
@@ -87,6 +91,7 @@ exports.handler = async (event, context) => {
       })
     };
   } catch (error) {
+    console.error('Error in calendar function:', error);
     return {
       statusCode: 500,
       headers,
