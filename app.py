@@ -21,12 +21,14 @@ import sqlite3
 import json
 import time
 import random
+import threading
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 import re
+import schedule
 
 # Configure logging
 logging.basicConfig(
@@ -358,6 +360,100 @@ def generate_real_signals():
     except Exception as e:
         logging.error(f"Error generating signals: {e}")
         return {'buy_fundamental': 0, 'sell_fundamental': 0, 'buy_technical': 0, 'sell_technical': 0}
+
+# ============================================================================
+# 🤖 AUTOMATED SIGNAL UPDATE SYSTEM
+# ============================================================================
+
+def automated_signal_update():
+    """Automated function to update signals - called by scheduler"""
+    try:
+        logging.info("🤖 AUTOMATED UPDATE: Starting scheduled signal update...")
+        
+        # Generate new signals
+        signal_counts = generate_real_signals()
+        
+        # Log the update
+        update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        logging.info(f"✅ AUTOMATED UPDATE COMPLETED at {update_time}")
+        logging.info(f"   📊 New signals generated:")
+        logging.info(f"   📈 BUY Fundamental: {signal_counts['buy_fundamental']}")
+        logging.info(f"   ⚡ BUY Technical: {signal_counts['buy_technical']}")
+        logging.info(f"   📉 SELL Fundamental: {signal_counts['sell_fundamental']}")
+        logging.info(f"   🔻 SELL Technical: {signal_counts['sell_technical']}")
+        
+        # Store update log in database
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Create update_logs table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS update_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                update_time TEXT,
+                buy_fundamental INTEGER,
+                buy_technical INTEGER,
+                sell_fundamental INTEGER,
+                sell_technical INTEGER,
+                total_signals INTEGER
+            )
+        ''')
+        
+        # Insert update log
+        total_signals = sum(signal_counts.values())
+        cursor.execute('''
+            INSERT INTO update_logs (
+                update_time, buy_fundamental, buy_technical, 
+                sell_fundamental, sell_technical, total_signals
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            update_time, signal_counts['buy_fundamental'], 
+            signal_counts['buy_technical'], signal_counts['sell_fundamental'],
+            signal_counts['sell_technical'], total_signals
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return signal_counts
+        
+    except Exception as e:
+        logging.error(f"❌ AUTOMATED UPDATE ERROR: {e}")
+        return None
+
+def start_scheduler():
+    """Start the automated scheduler"""
+    try:
+        logging.info("🤖 Starting automated signal scheduler...")
+        
+        # Schedule daily updates at 9:00 AM EST
+        schedule.every().day.at("09:00").do(automated_signal_update)
+        
+        # Schedule additional updates every 6 hours during market hours
+        schedule.every().day.at("12:00").do(automated_signal_update)  # Noon
+        schedule.every().day.at("15:00").do(automated_signal_update)  # 3 PM
+        
+        # Schedule weekend updates (Saturday and Sunday at 10 AM)
+        schedule.every().saturday.at("10:00").do(automated_signal_update)
+        schedule.every().sunday.at("10:00").do(automated_signal_update)
+        
+        logging.info("✅ Scheduler configured:")
+        logging.info("   📅 Daily updates: 9:00 AM, 12:00 PM, 3:00 PM")
+        logging.info("   📅 Weekend updates: 10:00 AM")
+        
+        # Run scheduler in background thread
+        def run_scheduler():
+            while True:
+                schedule.run_pending()
+                time.sleep(60)  # Check every minute
+        
+        scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+        scheduler_thread.start()
+        
+        logging.info("🚀 Automated scheduler started successfully!")
+        
+    except Exception as e:
+        logging.error(f"❌ Scheduler error: {e}")
 
 # Routes
 @app.route('/')
@@ -784,7 +880,7 @@ def admin_create_user():
 
 @app.route('/api/update-signals', methods=['POST'])
 def update_signals():
-    """Update signals"""
+    """Update signals manually"""
     try:
         signal_counts = generate_real_signals()
         return jsonify({
@@ -796,6 +892,87 @@ def update_signals():
     except Exception as e:
         logging.error(f"Error updating signals: {e}")
         return jsonify({'success': False, 'message': 'Failed to update signals'}), 500
+
+@app.route('/api/update-signals-auto', methods=['POST'])
+def update_signals_automated():
+    """Trigger automated signal update manually"""
+    try:
+        signal_counts = automated_signal_update()
+        if signal_counts:
+            return jsonify({
+                'success': True,
+                'message': 'Automated signal update completed successfully',
+                'counts': signal_counts,
+                'update_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Automated update failed'}), 500
+        
+    except Exception as e:
+        logging.error(f"Error in automated update: {e}")
+        return jsonify({'success': False, 'message': 'Automated update error'}), 500
+
+@app.route('/api/update-history')
+def get_update_history():
+    """Get history of automated updates"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Get last 10 updates
+        cursor.execute('''
+            SELECT update_time, buy_fundamental, buy_technical, 
+                   sell_fundamental, sell_technical, total_signals
+            FROM update_logs 
+            ORDER BY update_time DESC 
+            LIMIT 10
+        ''')
+        
+        updates = []
+        for row in cursor.fetchall():
+            updates.append({
+                'update_time': row[0],
+                'buy_fundamental': row[1],
+                'buy_technical': row[2],
+                'sell_fundamental': row[3],
+                'sell_technical': row[4],
+                'total_signals': row[5]
+            })
+        
+        conn.close()
+        return jsonify(updates)
+        
+    except Exception as e:
+        logging.error(f"Error getting update history: {e}")
+        return jsonify({'error': 'Failed to get update history'}), 500
+
+@app.route('/api/scheduler-status')
+def scheduler_status():
+    """Get scheduler status and next update times"""
+    try:
+        # Get next scheduled jobs
+        jobs = schedule.get_jobs()
+        next_updates = []
+        
+        for job in jobs:
+            next_run = job.next_run
+            if next_run:
+                next_updates.append({
+                    'job_func': str(job.job_func),
+                    'next_run': next_run.strftime("%Y-%m-%d %H:%M:%S"),
+                    'interval': str(job.interval)
+                })
+        
+        return jsonify({
+            'scheduler_active': True,
+            'total_jobs': len(jobs),
+            'next_updates': next_updates,
+            'current_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+    except Exception as e:
+        logging.error(f"Error getting scheduler status: {e}")
+        return jsonify({'error': 'Failed to get scheduler status'}), 500
 
 if __name__ == '__main__':
     print("🚀 STOCKS CALENDAR PRO - PROFESSIONAL TRADING PLATFORM 🚀")
@@ -815,6 +992,9 @@ if __name__ == '__main__':
     # Generate initial signals
     generate_real_signals()
     
+    # Start automated scheduler
+    start_scheduler()
+    
     # Get port from environment variable (for production)
     port = int(os.environ.get('PORT', 5003))
     
@@ -823,6 +1003,7 @@ if __name__ == '__main__':
     print("🔑 Admin access configured")
     print("💰 PayPal Live integration active")
     print("📊 Real-time market data enabled")
+    print("🤖 Automated signal updates enabled")
     print("============================================================")
     
     # Run in production mode if PORT is set

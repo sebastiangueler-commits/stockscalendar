@@ -954,6 +954,14 @@
                             <div class="stat-value" id="lastUpdate">Now</div>
                             <div class="stat-label">Last Update</div>
                         </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="nextUpdate">9:00 AM</div>
+                            <div class="stat-label">Next Auto Update</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="schedulerStatus">🤖 Active</div>
+                            <div class="stat-label">Auto Scheduler</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1017,7 +1025,19 @@
                     </div>
                 </div>
                 
-                <button class="login-btn" onclick="updateSignals()" style="margin-top: 2rem;">🔄 Update Signals</button>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button class="login-btn" onclick="updateSignals()">🔄 Update Signals</button>
+                    <button class="login-btn" onclick="updateSignalsAutomated()" style="background: linear-gradient(135deg, #00ff88, #00cc6a);">🤖 Auto Update</button>
+                    <button class="login-btn" onclick="checkSchedulerStatus()" style="background: linear-gradient(135deg, #ff6b6b, #ee5a52);">📊 Scheduler Status</button>
+                </div>
+                
+                <!-- Update History Section -->
+                <div id="updateHistory" style="margin-top: 2rem; display: none;">
+                    <h3 style="color: #00ff88; margin-bottom: 1rem;">📈 Update History</h3>
+                    <div id="updateHistoryList" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; max-height: 300px; overflow-y: auto;">
+                        <!-- Update history will be loaded here -->
+                    </div>
+                </div>
             </div>
 
             <!-- Billing Section -->
@@ -1416,6 +1436,28 @@
                 // Update last update time
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
                 
+                // Check scheduler status
+                try {
+                    const schedulerResponse = await fetch(`${API_BASE}/api/scheduler-status`);
+                    const schedulerData = await schedulerResponse.json();
+                    
+                    if (schedulerData.scheduler_active) {
+                        document.getElementById('schedulerStatus').textContent = '🤖 Active';
+                        
+                        // Update next update time
+                        if (schedulerData.next_updates && schedulerData.next_updates.length > 0) {
+                            const nextUpdate = new Date(schedulerData.next_updates[0].next_run);
+                            document.getElementById('nextUpdate').textContent = nextUpdate.toLocaleTimeString();
+                        }
+                    } else {
+                        document.getElementById('schedulerStatus').textContent = '❌ Inactive';
+                        document.getElementById('nextUpdate').textContent = 'N/A';
+                    }
+                } catch (schedulerError) {
+                    console.error('Error checking scheduler status:', schedulerError);
+                    document.getElementById('schedulerStatus').textContent = '❓ Unknown';
+                }
+                
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -1622,6 +1664,108 @@
             } catch (error) {
                 console.error('Error updating signals:', error);
                 alert('Error updating signals. Please try again.');
+            }
+        }
+
+        async function updateSignalsAutomated() {
+            try {
+                const response = await fetch(`${API_BASE}/api/update-signals-auto`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`🤖 Automated update completed!\n\n📊 New signals:\n• BUY Fundamental: ${data.counts.buy_fundamental}\n• BUY Technical: ${data.counts.buy_technical}\n• SELL Fundamental: ${data.counts.sell_fundamental}\n• SELL Technical: ${data.counts.sell_technical}\n\n⏰ Update time: ${data.update_time}`);
+                    loadStats();
+                    loadAdminStats();
+                    loadUpdateHistory();
+                } else {
+                    alert('Failed to run automated update: ' + data.message);
+                }
+                
+            } catch (error) {
+                console.error('Error running automated update:', error);
+                alert('Error running automated update. Please try again.');
+            }
+        }
+
+        async function checkSchedulerStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/api/scheduler-status`);
+                const data = await response.json();
+                
+                if (data.scheduler_active) {
+                    let statusMessage = `🤖 Scheduler Status: ACTIVE\n\n📅 Total Jobs: ${data.total_jobs}\n⏰ Current Time: ${data.current_time}\n\n📋 Next Updates:`;
+                    
+                    data.next_updates.forEach(update => {
+                        statusMessage += `\n• ${update.next_run}`;
+                    });
+                    
+                    alert(statusMessage);
+                    
+                    // Update the scheduler status display
+                    document.getElementById('schedulerStatus').textContent = '🤖 Active';
+                    
+                    // Show update history
+                    document.getElementById('updateHistory').style.display = 'block';
+                    loadUpdateHistory();
+                } else {
+                    alert('❌ Scheduler is not active');
+                    document.getElementById('schedulerStatus').textContent = '❌ Inactive';
+                }
+                
+            } catch (error) {
+                console.error('Error checking scheduler status:', error);
+                alert('Error checking scheduler status. Please try again.');
+            }
+        }
+
+        async function loadUpdateHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/api/update-history`);
+                const updates = await response.json();
+                
+                const historyList = document.getElementById('updateHistoryList');
+                historyList.innerHTML = '';
+                
+                if (updates.length === 0) {
+                    historyList.innerHTML = '<p style="color: #888; text-align: center;">No update history available</p>';
+                    return;
+                }
+                
+                updates.forEach(update => {
+                    const updateItem = document.createElement('div');
+                    updateItem.style.cssText = `
+                        background: rgba(0,255,136,0.1);
+                        border: 1px solid rgba(0,255,136,0.3);
+                        border-radius: 8px;
+                        padding: 1rem;
+                        margin-bottom: 0.5rem;
+                        font-size: 0.9rem;
+                    `;
+                    
+                    updateItem.innerHTML = `
+                        <div style="color: #00ff88; font-weight: bold; margin-bottom: 0.5rem;">
+                            📅 ${update.update_time}
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.8rem;">
+                            <div>📈 BUY Fund: ${update.buy_fundamental}</div>
+                            <div>⚡ BUY Tech: ${update.buy_technical}</div>
+                            <div>📉 SELL Fund: ${update.sell_fundamental}</div>
+                            <div>🔻 SELL Tech: ${update.sell_technical}</div>
+                        </div>
+                        <div style="color: #00ff88; font-weight: bold; margin-top: 0.5rem;">
+                            Total: ${update.total_signals} signals
+                        </div>
+                    `;
+                    
+                    historyList.appendChild(updateItem);
+                });
+                
+            } catch (error) {
+                console.error('Error loading update history:', error);
+                document.getElementById('updateHistoryList').innerHTML = '<p style="color: #ff6b6b; text-align: center;">Error loading update history</p>';
             }
         }
 
