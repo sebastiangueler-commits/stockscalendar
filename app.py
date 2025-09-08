@@ -54,82 +54,82 @@ DB_PATH = 'database.db'
 def init_database():
     """Initialize the database with all required tables"""
     try:
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # Users table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            email TEXT,
-            subscription_type TEXT DEFAULT 'free',
-            subscription_expires DATETIME,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            is_admin BOOLEAN DEFAULT FALSE
-        )
-    ''')
-    
-    # Signals table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS signals (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            symbol TEXT NOT NULL,
-            signal_type TEXT NOT NULL,
-            analysis_type TEXT NOT NULL,
-            price REAL,
-            change_percent REAL,
-            volume INTEGER,
-            market_cap TEXT,
-            pe_ratio REAL,
-            rsi REAL,
-            sma20 REAL,
-            sma50 REAL,
-            macd REAL,
-            recommendation TEXT,
-            confidence REAL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Payments table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS payments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            amount REAL,
-            currency TEXT DEFAULT 'USD',
-            payment_method TEXT,
-            transaction_id TEXT,
-            status TEXT DEFAULT 'pending',
-            paypal_order_id TEXT,
-            paypal_capture_id TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # Add PayPal columns if they don't exist (for existing databases)
-    try:
-        cursor.execute('ALTER TABLE payments ADD COLUMN paypal_order_id TEXT')
-    except:
-        pass  # Column already exists
-    
-    try:
-        cursor.execute('ALTER TABLE payments ADD COLUMN paypal_capture_id TEXT')
-    except:
-        pass  # Column already exists
-    
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Users table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                email TEXT,
+                subscription_type TEXT DEFAULT 'free',
+                subscription_expires DATETIME,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                is_admin BOOLEAN DEFAULT FALSE
+            )
+        ''')
+        
+        # Signals table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS signals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol TEXT NOT NULL,
+                signal_type TEXT NOT NULL,
+                analysis_type TEXT NOT NULL,
+                price REAL,
+                change_percent REAL,
+                volume INTEGER,
+                market_cap TEXT,
+                pe_ratio REAL,
+                rsi REAL,
+                sma20 REAL,
+                sma50 REAL,
+                macd REAL,
+                recommendation TEXT,
+                confidence REAL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Payments table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                amount REAL,
+                currency TEXT DEFAULT 'USD',
+                payment_method TEXT,
+                transaction_id TEXT,
+                status TEXT DEFAULT 'pending',
+                paypal_order_id TEXT,
+                paypal_capture_id TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        # Add PayPal columns if they don't exist (for existing databases)
+        try:
+            cursor.execute('ALTER TABLE payments ADD COLUMN paypal_order_id TEXT')
+        except:
+            pass  # Column already exists
+        
+        try:
+            cursor.execute('ALTER TABLE payments ADD COLUMN paypal_capture_id TEXT')
+        except:
+            pass  # Column already exists
+        
         # Create admin user - ensure it exists
-    cursor.execute('SELECT COUNT(*) FROM users WHERE username = ?', ('admin',))
+        cursor.execute('SELECT COUNT(*) FROM users WHERE username = ?', ('admin',))
         admin_count = cursor.fetchone()[0]
         
         if admin_count == 0:
-        cursor.execute('''
-            INSERT INTO users (username, password, email, subscription_type, is_admin)
-            VALUES (?, ?, ?, ?, ?)
-        ''', ('admin', 'admin123', 'admin@stockscalendar.com', 'forever', True))
+            cursor.execute('''
+                INSERT INTO users (username, password, email, subscription_type, is_admin)
+                VALUES (?, ?, ?, ?, ?)
+            ''', ('admin', 'admin123', 'admin@stockscalendar.com', 'forever', True))
             logging.info("✅ Admin user created: admin / admin123")
         else:
             logging.info("✅ Admin user already exists")
@@ -141,10 +141,10 @@ def init_database():
             logging.info(f"✅ Admin user verified: {admin_user}")
         else:
             logging.error("❌ Admin user not found after creation")
-    
-    conn.commit()
-    conn.close()
-    logging.info("✅ Database initialized successfully")
+        
+        conn.commit()
+        conn.close()
+        logging.info("✅ Database initialized successfully")
         
     except Exception as e:
         logging.error(f"❌ Database initialization error: {e}")
