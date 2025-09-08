@@ -956,6 +956,30 @@ def regenerate_signals():
             'message': f'Error regenerating signals: {str(e)}'
         }), 500
 
+@app.route('/api/status')
+def app_status():
+    """Check application status"""
+    try:
+        # Check if we have any signals
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) FROM signals')
+        signal_count = cursor.fetchone()[0]
+        conn.close()
+        
+        return jsonify({
+            'status': 'running',
+            'environment': 'vercel' if os.environ.get('VERCEL') else 'local',
+            'signal_count': signal_count,
+            'database_initialized': True,
+            'background_tasks': 'started' if os.environ.get('VERCEL') else 'completed'
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
 @app.route('/api/admin/create-user', methods=['POST'])
 def admin_create_user():
     """Create a new user (admin only)"""
@@ -1108,20 +1132,34 @@ if __name__ == '__main__':
     # Get port from environment variable (for production)
     port = int(os.environ.get('PORT', 5003))
     
-    # Initialize signals and scheduler for both local and Vercel
-    try:
-        # Generate initial signals (with error handling)
-        generate_real_signals()
-        print("✅ Initial signals generated")
-    except Exception as e:
-        print(f"⚠️ Signal generation failed: {e}")
+    # Initialize signals and scheduler intelligently
+    def initialize_background_tasks():
+        """Initialize background tasks without blocking"""
+        try:
+            # Generate initial signals (with error handling)
+            generate_real_signals()
+            print("✅ Initial signals generated")
+        except Exception as e:
+            print(f"⚠️ Signal generation failed: {e}")
+        
+        try:
+            # Start automated scheduler (with error handling)
+            start_scheduler()
+            print("✅ Scheduler started")
+        except Exception as e:
+            print(f"⚠️ Scheduler failed: {e}")
     
-    try:
-        # Start automated scheduler (with error handling)
-        start_scheduler()
-        print("✅ Scheduler started")
-    except Exception as e:
-        print(f"⚠️ Scheduler failed: {e}")
+    # For Vercel: Initialize in background to avoid timeout
+    if os.environ.get('VERCEL'):
+        # In Vercel, initialize in background thread
+        import threading
+        thread = threading.Thread(target=initialize_background_tasks)
+        thread.daemon = True
+        thread.start()
+        print("🔄 Background tasks started in Vercel")
+    else:
+        # Local: Initialize normally
+        initialize_background_tasks()
     
     print("🌐 Professional server started")
     print("📡 API endpoints available")
