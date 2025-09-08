@@ -1247,10 +1247,18 @@
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
             
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+            
             loginBtn.disabled = true;
             loginBtn.textContent = 'Logging in...';
             
             try {
+                console.log(`🔐 Attempting login for: ${username}`);
+                console.log(`🌐 API Base URL: ${API_BASE}`);
+                
                 const response = await fetch(`${API_BASE}/api/auth/login`, {
                     method: 'POST',
                     headers: {
@@ -1259,7 +1267,10 @@
                     body: JSON.stringify({ username, password })
                 });
                 
+                console.log(`📡 Response status: ${response.status}`);
+                
                 const data = await response.json();
+                console.log(`📊 Response data:`, data);
                 
                 if (data.success) {
                     currentUser = data.user;
@@ -1277,12 +1288,15 @@
                     closeModal('loginModal');
                     loadStats();
                     loadAdminStats();
+                    
+                    console.log('✅ Login successful');
                 } else {
-                    alert('Login failed: ' + data.message);
+                    console.error('❌ Login failed:', data.message);
+                    alert(`Login failed: ${data.message}`);
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed. Please try again.');
+                console.error('❌ Login error:', error);
+                alert(`Login failed: ${error.message}. Please check the console for details.`);
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Login';

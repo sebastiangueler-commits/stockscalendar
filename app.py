@@ -53,85 +53,102 @@ DB_PATH = 'database.db'
 
 def init_database():
     """Initialize the database with all required tables"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # Users table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            email TEXT,
-            subscription_type TEXT DEFAULT 'free',
-            subscription_expires DATETIME,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            is_admin BOOLEAN DEFAULT FALSE
-        )
-    ''')
-    
-    # Signals table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS signals (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            symbol TEXT NOT NULL,
-            signal_type TEXT NOT NULL,
-            analysis_type TEXT NOT NULL,
-            price REAL,
-            change_percent REAL,
-            volume INTEGER,
-            market_cap TEXT,
-            pe_ratio REAL,
-            rsi REAL,
-            sma20 REAL,
-            sma50 REAL,
-            macd REAL,
-            recommendation TEXT,
-            confidence REAL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Payments table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS payments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            amount REAL,
-            currency TEXT DEFAULT 'USD',
-            payment_method TEXT,
-            transaction_id TEXT,
-            status TEXT DEFAULT 'pending',
-            paypal_order_id TEXT,
-            paypal_capture_id TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # Add PayPal columns if they don't exist (for existing databases)
     try:
-        cursor.execute('ALTER TABLE payments ADD COLUMN paypal_order_id TEXT')
-    except:
-        pass  # Column already exists
-    
-    try:
-        cursor.execute('ALTER TABLE payments ADD COLUMN paypal_capture_id TEXT')
-    except:
-        pass  # Column already exists
-    
-    # Create admin user
-    cursor.execute('SELECT COUNT(*) FROM users WHERE username = ?', ('admin',))
-    if cursor.fetchone()[0] == 0:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Users table
         cursor.execute('''
-            INSERT INTO users (username, password, email, subscription_type, is_admin)
-            VALUES (?, ?, ?, ?, ?)
-        ''', ('admin', 'admin123', 'admin@stockscalendar.com', 'forever', True))
-        logging.info("✅ Admin created: admin / admin123")
-    
-    conn.commit()
-    conn.close()
-    logging.info("✅ Database initialized successfully")
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                email TEXT,
+                subscription_type TEXT DEFAULT 'free',
+                subscription_expires DATETIME,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                is_admin BOOLEAN DEFAULT FALSE
+            )
+        ''')
+        
+        # Signals table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS signals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol TEXT NOT NULL,
+                signal_type TEXT NOT NULL,
+                analysis_type TEXT NOT NULL,
+                price REAL,
+                change_percent REAL,
+                volume INTEGER,
+                market_cap TEXT,
+                pe_ratio REAL,
+                rsi REAL,
+                sma20 REAL,
+                sma50 REAL,
+                macd REAL,
+                recommendation TEXT,
+                confidence REAL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Payments table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                amount REAL,
+                currency TEXT DEFAULT 'USD',
+                payment_method TEXT,
+                transaction_id TEXT,
+                status TEXT DEFAULT 'pending',
+                paypal_order_id TEXT,
+                paypal_capture_id TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        # Add PayPal columns if they don't exist (for existing databases)
+        try:
+            cursor.execute('ALTER TABLE payments ADD COLUMN paypal_order_id TEXT')
+        except:
+            pass  # Column already exists
+        
+        try:
+            cursor.execute('ALTER TABLE payments ADD COLUMN paypal_capture_id TEXT')
+        except:
+            pass  # Column already exists
+        
+        # Create admin user - ensure it exists
+        cursor.execute('SELECT COUNT(*) FROM users WHERE username = ?', ('admin',))
+        admin_count = cursor.fetchone()[0]
+        
+        if admin_count == 0:
+            cursor.execute('''
+                INSERT INTO users (username, password, email, subscription_type, is_admin)
+                VALUES (?, ?, ?, ?, ?)
+            ''', ('admin', 'admin123', 'admin@stockscalendar.com', 'forever', True))
+            logging.info("✅ Admin user created: admin / admin123")
+        else:
+            logging.info("✅ Admin user already exists")
+        
+        # Verify admin user exists
+        cursor.execute('SELECT username, is_admin FROM users WHERE username = ?', ('admin',))
+        admin_user = cursor.fetchone()
+        if admin_user:
+            logging.info(f"✅ Admin user verified: {admin_user}")
+        else:
+            logging.error("❌ Admin user not found after creation")
+        
+        conn.commit()
+        conn.close()
+        logging.info("✅ Database initialized successfully")
+        
+    except Exception as e:
+        logging.error(f"❌ Database initialization error: {e}")
+        raise e
 
 def get_paypal_access_token():
     """Get PayPal access token for API calls"""
@@ -571,13 +588,23 @@ def login():
         return '', 200
     
     try:
+        # Ensure database is initialized
+        init_database()
+        
         data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'No data provided'}), 400
+            
         username = data.get('username')
         password = data.get('password')
+        
+        if not username or not password:
+            return jsonify({'success': False, 'message': 'Username and password required'}), 400
         
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
+        # Check if user exists
         cursor.execute('''
             SELECT id, username, email, subscription_type, is_admin
             FROM users
@@ -600,11 +627,12 @@ def login():
                 }
             })
         else:
+            logging.warning(f"❌ Login failed for username: {username}")
             return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
             
     except Exception as e:
         logging.error(f"Error in login: {e}")
-        return jsonify({'success': False, 'message': 'Login error'}), 500
+        return jsonify({'success': False, 'message': f'Login error: {str(e)}'}), 500
 
 @app.route('/api/auth/register', methods=['POST', 'OPTIONS'])
 def register():
@@ -866,6 +894,42 @@ def active_users():
     except Exception as e:
         logging.error(f"Error getting active users: {e}")
         return jsonify({'error': 'Failed to get active users'}), 500
+
+@app.route('/api/debug/database')
+def debug_database():
+    """Debug endpoint to check database status"""
+    try:
+        # Ensure database is initialized
+        init_database()
+        
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Check if users table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+        users_table_exists = cursor.fetchone() is not None
+        
+        # Count users
+        cursor.execute('SELECT COUNT(*) FROM users')
+        user_count = cursor.fetchone()[0]
+        
+        # Check admin user
+        cursor.execute('SELECT username, is_admin FROM users WHERE username = ?', ('admin',))
+        admin_user = cursor.fetchone()
+        
+        conn.close()
+        
+        return jsonify({
+            'database_path': DB_PATH,
+            'users_table_exists': users_table_exists,
+            'user_count': user_count,
+            'admin_user': admin_user,
+            'status': 'ok'
+        })
+        
+    except Exception as e:
+        logging.error(f"Debug database error: {e}")
+        return jsonify({'error': str(e), 'status': 'error'}), 500
 
 @app.route('/api/admin/create-user', methods=['POST'])
 def admin_create_user():
