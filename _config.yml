@@ -1,0 +1,15 @@
+# GitHub Pages Configuration
+title: Magic Stocks Calendar
+description: Professional Trading Signals Platform
+baseurl: "/stockscalendar"
+url: "https://sebastiangueler-commits.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
