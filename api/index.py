@@ -79,6 +79,9 @@ def login():
     """User login"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'No data provided'}), 400
+            
         username = data.get('username')
         password = data.get('password')
         
