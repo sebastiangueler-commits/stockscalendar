@@ -1,209 +1,206 @@
-# Magic Stocks Calendar - AI-Powered Stock Analysis Platform
+# 🚀 Magic Stocks Calendar - Professional Trading Platform
 
-## 🚀 Live Application
-**Frontend**: http://localhost:3000  
-**Backend API**: http://localhost:8001
+## 📊 Overview
+Magic Stocks Calendar is a professional trading signals platform that provides real-time BUY/SELL recommendations based on advanced fundamental and technical analysis. The platform features a complete PayPal payment integration for premium subscriptions.
 
-## 📊 Features
+## ✨ Features
 
-### 🎯 **Three Types of Signals**
-- **Technical Signals**: Real-time analysis with RSI, MACD, Bollinger Bands
-- **Historical Signals**: Pattern analysis over 2-5 years, seasonal trends, market cycles
-- **Fundamental Signals**: P/E, P/B, ROE, growth and valuation analysis
+### 🎯 Trading Signals
+- **BUY Fundamental Signals**: Based on company fundamentals, P/E ratios, market cap analysis
+- **BUY Technical Signals**: RSI, SMA analysis, technical indicators
+- **SELL Fundamental Signals**: Overvalued companies, poor fundamentals
+- **SELL Technical Signals**: Technical sell signals based on momentum indicators
 
-### 💰 **Pricing Plans**
-- **Monthly Plan**: $9.99/month
-- **Annual Plan**: $99.99/year (Save 17%)
-- **Lifetime Plan**: $300.00 (One-time payment)
+### 💰 Payment System
+- **Real PayPal Integration**: Live production PayPal API
+- **Subscription Plans**:
+  - Monthly: $9.99/month
+  - Annual: $100/year (17% savings)
+  - Forever: $300 one-time payment
+- **Secure Payment Processing**: Real-time payment verification
 
-### 🔒 **Security & Guarantees**
-- 100% Secure PayPal payments
-- 30-day money-back guarantee
-- 24/7 customer support
-- No credit card data stored
+### 👥 User Management
+- **User Authentication**: Secure login/registration system
+- **Premium Subscriptions**: Access control based on subscription status
+- **Admin Dashboard**: User management and system statistics
+
+### 📈 Real-Time Data
+- **Finviz Scraper**: Live market data from Finviz
+- **Professional Analysis**: Advanced signal generation algorithms
+- **Market Statistics**: Real-time market overview
 
 ## 🛠️ Technology Stack
 
-### Frontend
-- **React 18** with modern hooks
-- **Tailwind CSS** for styling
-- **Lucide React** for icons
-- **Responsive design** for all devices
-
 ### Backend
-- **Python FastAPI** for high-performance API
-- **Real-time data processing** from Yahoo Finance
-- **AI-powered analysis** algorithms
-- **RESTful API** design
+- **Python Flask**: Web framework
+- **SQLite**: Database
+- **PayPal API**: Payment processing
+- **BeautifulSoup**: Web scraping
+- **Requests**: HTTP client
+
+### Frontend
+- **HTML5/CSS3**: Modern responsive design
+- **JavaScript**: Interactive functionality
+- **PayPal SDK**: Payment integration
+- **Professional UI**: Dark theme with gradients
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+ 
-- Python 3.8+
-- npm or yarn
+- Python 3.7+
+- PayPal Developer Account (for live payments)
 
 ### Installation
 
 1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd stockscalendar
-```
+   ```bash
+   git clone https://github.com/yourusername/magic-stocks-calendar.git
+   cd magic-stocks-calendar
+   ```
 
-2. **Install Frontend Dependencies**
-```bash
-cd frontend
-npm install
-```
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-3. **Install Backend Dependencies**
-```bash
-pip install -r requirements.txt
-```
+3. **Install dependencies**
+   ```bash
+   pip install flask flask-cors requests beautifulsoup4
+   ```
 
-### Running the Application
+4. **Run the application**
+   ```bash
+   python app.py
+   ```
 
-1. **Start the Backend**
-```bash
-python app.py
-```
-Backend will run on http://localhost:8001
+5. **Access the platform**
+   - Open your browser to `http://localhost:5003`
+   - Open `index.html` for the frontend interface
 
-2. **Start the Frontend**
-```bash
-cd frontend
-npm start
-```
-Frontend will run on http://localhost:3000
+## 🔧 Configuration
 
-### Production Build
+### PayPal Setup
+The application is configured with live PayPal credentials:
+- **Client ID**: `AU92SQfA-D5YaqaArq7lSakdZmJI9e4CIcsZWYM2pnIEfYQ0dM1tAgd61QWOq1jBt_sbHdaXaHw9WK_-`
+- **Mode**: Live production
+- **Base URL**: `https://api.paypal.com`
 
-1. **Build Frontend for Production**
-```bash
-cd frontend
-npm run build
-```
+### Database
+- **File**: `database.db`
+- **Tables**: users, signals, payments, subscriptions
+- **Auto-initialization**: Database creates automatically on first run
 
-2. **Serve Production Build**
-```bash
-npx serve -s build
-```
-
-## 📱 Demo Access
-
-**Username**: admin@magicstocks.com  
-**Password**: admin123
-
-## 🎯 Key Features
-
-### 📈 **Advanced Analytics**
-- 4,500+ stocks analyzed daily
-- 95% accuracy rate
-- 45-day forecast calendar
-- Real-time updates
-
-### 💳 **Payment Integration**
-- PayPal integration for secure payments
-- Multiple payment options
-- Mobile-optimized payment flow
-- WhatsApp support integration
-
-### 🎨 **User Experience**
-- Modern, intuitive interface
-- Mobile-responsive design
-- Real-time data updates
-- Professional dashboard
-
-## 🔧 API Endpoints
+## 📡 API Endpoints
 
 ### Authentication
+- `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
 
-### Calendar Data
-- `GET /api/calendar/monthly` - Monthly calendar
-- `GET /api/calendar/historical` - Historical data
-- `GET /api/calendar/fundamental` - Fundamental analysis
-
-### System
-- `GET /api/status` - System status
-- `POST /api/force-update` - Force analysis update
-- `POST /api/daily-update` - Daily update
+### Signals
+- `GET /api/signals/buy_fundamental` - BUY fundamental signals
+- `GET /api/signals/buy_technical` - BUY technical signals
+- `GET /api/signals/sell_fundamental` - SELL fundamental signals
+- `GET /api/signals/sell_technical` - SELL technical signals
+- `POST /api/update-signals` - Update all signals
 
 ### Payments
-- `GET /api/payment/plans` - Get pricing plans
-- `POST /api/payment/create` - Create payment
+- `POST /api/payment/process` - Process PayPal payment
+- `POST /api/payment/capture` - Capture PayPal order
 
-## 🌐 Deployment
+### Admin
+- `GET /api/admin/stats` - Admin statistics
+- `GET /api/admin/users` - User management
+- `POST /api/admin/create-user` - Create new user
 
-### Frontend Deployment
-The frontend is built as a static React app and can be deployed to:
-- **Vercel** (Recommended)
-- **Netlify**
-- **AWS S3 + CloudFront**
-- **GitHub Pages**
+## 🎨 Frontend Features
 
-### Backend Deployment
-The backend can be deployed to:
-- **Heroku**
-- **AWS EC2**
-- **DigitalOcean**
-- **Railway**
+### Professional Design
+- **Dark Theme**: Modern dark interface
+- **Responsive**: Works on desktop and mobile
+- **Animations**: Smooth transitions and effects
+- **Loading Screens**: Professional loading experience
+
+### User Experience
+- **Intuitive Navigation**: Easy-to-use interface
+- **Real-time Updates**: Live data refresh
+- **Payment Flow**: Seamless PayPal integration
+- **Dashboard**: Comprehensive user dashboard
+
+## 🔐 Security Features
+
+- **Secure Authentication**: Password-based login system
+- **Payment Security**: PayPal's secure payment processing
+- **Data Protection**: Secure database storage
+- **Access Control**: Subscription-based feature access
+
+## 📊 Signal Generation
+
+The platform generates trading signals using:
+
+1. **Fundamental Analysis**:
+   - P/E ratio analysis
+   - Market cap evaluation
+   - Volume analysis
+   - Company fundamentals
+
+2. **Technical Analysis**:
+   - RSI (Relative Strength Index)
+   - SMA (Simple Moving Average)
+   - Momentum indicators
+   - Price action analysis
+
+## 🚀 Deployment
+
+### Production Deployment
+1. **Server Setup**: Use a production WSGI server (Gunicorn, uWSGI)
+2. **Database**: Consider PostgreSQL for production
+3. **SSL**: Enable HTTPS for secure payments
+4. **Environment**: Set production environment variables
 
 ### Environment Variables
 ```bash
-# Backend
-API_BASE_URL=http://localhost:8001
-
-# Frontend
-REACT_APP_API_URL=http://localhost:8001
+export FLASK_ENV=production
+export PAYPAL_CLIENT_ID=your_client_id
+export PAYPAL_CLIENT_SECRET=your_client_secret
 ```
 
-## 📊 Performance
+## 📈 Performance
 
-- **Frontend Bundle**: 60.28 kB (gzipped)
-- **CSS Bundle**: 4.46 kB (gzipped)
-- **Load Time**: < 2 seconds
-- **API Response**: < 500ms
+- **Real-time Data**: Live market data updates
+- **Efficient Scraping**: Optimized Finviz data extraction
+- **Fast Response**: Optimized database queries
+- **Scalable**: Ready for high-traffic deployment
 
-## 🎯 Business Model
+## 🤝 Contributing
 
-### Revenue Streams
-1. **Monthly Subscriptions**: $9.99/month
-2. **Annual Subscriptions**: $99.99/year
-3. **Lifetime Access**: $300.00
-
-### Target Market
-- Day traders
-- Swing traders
-- Long-term investors
-- Financial professionals
-
-## 📈 Growth Strategy
-
-1. **SEO Optimization** for organic traffic
-2. **Social Media Marketing** on trading communities
-3. **Affiliate Program** for influencers
-4. **Content Marketing** with trading insights
-5. **Email Marketing** for user retention
-
-## 🔒 Security
-
-- **PayPal Integration** for secure payments
-- **No sensitive data storage** on our servers
-- **HTTPS encryption** for all communications
-- **Regular security audits**
-
-## 📞 Support
-
-- **Email**: support@magicstocks.com
-- **WhatsApp**: +1-XXX-XXX-XXXX
-- **24/7 Support** for premium users
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
-This project is proprietary software. All rights reserved.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+- **Email**: support@magicstockscalendar.com
+- **Documentation**: Check the API documentation
+- **Issues**: Report bugs via GitHub Issues
+
+## 🔮 Future Features
+
+- **Mobile App**: Native mobile application
+- **Advanced Analytics**: More sophisticated analysis tools
+- **Portfolio Tracking**: Personal portfolio management
+- **API Access**: Public API for developers
+- **White-label**: Customizable branding options
 
 ---
 
-**Magic Stocks Calendar** - Your AI-powered trading companion 🚀📈
+**Magic Stocks Calendar** - Professional Trading Signals Platform
+Built with ❤️ for serious traders and investors.
