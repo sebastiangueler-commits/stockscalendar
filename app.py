@@ -956,6 +956,37 @@ def regenerate_signals():
             'message': f'Error regenerating signals: {str(e)}'
         }), 500
 
+@app.route('/api/init-signals', methods=['POST'])
+def init_signals():
+    """Initialize signals if none exist"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Check if we have any signals
+        cursor.execute('SELECT COUNT(*) FROM signals')
+        signal_count = cursor.fetchone()[0]
+        conn.close()
+        
+        if signal_count == 0:
+            generate_real_signals()
+            return jsonify({
+                'success': True,
+                'message': 'Signals initialized successfully'
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'message': f'Signals already exist ({signal_count} signals)'
+            })
+            
+    except Exception as e:
+        logging.error(f"Error initializing signals: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error initializing signals: {str(e)}'
+        }), 500
+
 @app.route('/api/status')
 def app_status():
     """Check application status"""
@@ -1132,34 +1163,12 @@ if __name__ == '__main__':
     # Get port from environment variable (for production)
     port = int(os.environ.get('PORT', 5003))
     
-    # Initialize signals and scheduler intelligently
-    def initialize_background_tasks():
-        """Initialize background tasks without blocking"""
-        try:
-            # Generate initial signals (with error handling)
-            generate_real_signals()
-            print("✅ Initial signals generated")
-        except Exception as e:
-            print(f"⚠️ Signal generation failed: {e}")
-        
-        try:
-            # Start automated scheduler (with error handling)
-            start_scheduler()
-            print("✅ Scheduler started")
-        except Exception as e:
-            print(f"⚠️ Scheduler failed: {e}")
+    # Simple initialization - no heavy operations at startup
+    print("✅ Database initialized")
+    print("✅ Application ready")
     
-    # For Vercel: Initialize in background to avoid timeout
-    if os.environ.get('VERCEL'):
-        # In Vercel, initialize in background thread
-        import threading
-        thread = threading.Thread(target=initialize_background_tasks)
-        thread.daemon = True
-        thread.start()
-        print("🔄 Background tasks started in Vercel")
-    else:
-        # Local: Initialize normally
-        initialize_background_tasks()
+    # Heavy operations will be triggered by API calls
+    print("📝 Note: Signals will be generated on first API call")
     
     print("🌐 Professional server started")
     print("📡 API endpoints available")
