@@ -815,6 +815,9 @@ if __name__ == '__main__':
     # Generate initial signals
     generate_real_signals()
     
+    # Get port from environment variable (for production)
+    port = int(os.environ.get('PORT', 5003))
+    
     print("🌐 Professional server started on http://localhost:5003")
     print("📡 API endpoints available")
     print("🔑 Admin access configured")
@@ -822,4 +825,8 @@ if __name__ == '__main__':
     print("📊 Real-time market data enabled")
     print("============================================================")
     
-    app.run(host='0.0.0.0', port=5003, debug=True)
+    # Run in production mode if PORT is set
+    if os.environ.get('PORT'):
+        app.run(host='0.0.0.0', port=port, debug=False)
+    else:
+        app.run(host='0.0.0.0', port=port, debug=True)
