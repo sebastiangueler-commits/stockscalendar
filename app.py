@@ -940,6 +940,22 @@ def debug_database():
         logging.error(f"Debug database error: {e}")
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
+@app.route('/api/regenerate-signals', methods=['POST'])
+def regenerate_signals():
+    """Regenerate signals manually"""
+    try:
+        generate_real_signals()
+        return jsonify({
+            'success': True,
+            'message': 'Signals regenerated successfully'
+        })
+    except Exception as e:
+        logging.error(f"Error regenerating signals: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error regenerating signals: {str(e)}'
+        }), 500
+
 @app.route('/api/admin/create-user', methods=['POST'])
 def admin_create_user():
     """Create a new user (admin only)"""
@@ -1092,24 +1108,33 @@ if __name__ == '__main__':
     # Get port from environment variable (for production)
     port = int(os.environ.get('PORT', 5003))
     
+    # Initialize signals and scheduler for both local and Vercel
+    try:
+        # Generate initial signals (with error handling)
+        generate_real_signals()
+        print("✅ Initial signals generated")
+    except Exception as e:
+        print(f"⚠️ Signal generation failed: {e}")
+    
+    try:
+        # Start automated scheduler (with error handling)
+        start_scheduler()
+        print("✅ Scheduler started")
+    except Exception as e:
+        print(f"⚠️ Scheduler failed: {e}")
+    
+    print("🌐 Professional server started")
+    print("📡 API endpoints available")
+    print("🔑 Admin access configured")
+    print("💰 PayPal Live integration active")
+    print("📊 Real-time market data enabled")
+    print("🤖 Automated signal updates enabled")
+    print("============================================================")
+    
     # For Vercel deployment, don't run the server here
     # Vercel will handle the server execution
     if __name__ == '__main__':
         # Only run locally
-        # Generate initial signals
-        generate_real_signals()
-        
-        # Start automated scheduler
-        start_scheduler()
-        
-        print("🌐 Professional server started on http://localhost:5003")
-        print("📡 API endpoints available")
-        print("🔑 Admin access configured")
-        print("💰 PayPal Live integration active")
-        print("📊 Real-time market data enabled")
-        print("🤖 Automated signal updates enabled")
-        print("============================================================")
-        
         app.run(host='0.0.0.0', port=port, debug=True)
 
 # For Vercel deployment
