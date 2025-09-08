@@ -460,10 +460,10 @@ def start_scheduler():
 def index():
     """Serve the perfect frontend"""
     try:
-        with open('perfect_frontend.html', 'r', encoding='utf-8') as f:
+        with open('index.html', 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        return "Frontend file not found. Please ensure perfect_frontend.html exists."
+        return "Frontend file not found. Please ensure index.html exists."
 
 @app.route('/api/stats')
 def get_stats():
