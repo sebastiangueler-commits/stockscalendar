@@ -840,6 +840,33 @@ def admin_users():
         logging.error(f"Error getting users: {e}")
         return jsonify({'error': 'Failed to get users'}), 500
 
+@app.route('/api/active-users')
+def active_users():
+    """Get count of active users (public endpoint)"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # Count total users
+        cursor.execute('SELECT COUNT(*) FROM users')
+        total_users = cursor.fetchone()[0]
+        
+        # Count premium users
+        cursor.execute('SELECT COUNT(*) FROM users WHERE subscription_type != "free"')
+        premium_users = cursor.fetchone()[0]
+        
+        conn.close()
+        
+        return jsonify({
+            'total_users': total_users,
+            'premium_users': premium_users,
+            'active_users': total_users  # For now, all users are considered active
+        })
+        
+    except Exception as e:
+        logging.error(f"Error getting active users: {e}")
+        return jsonify({'error': 'Failed to get active users'}), 500
+
 @app.route('/api/admin/create-user', methods=['POST'])
 def admin_create_user():
     """Create a new user (admin only)"""

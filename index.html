@@ -943,8 +943,8 @@
                             <div class="stat-label">Total Signals</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value" id="activeUsers">1</div>
-                            <div class="stat-label">Active Users</div>
+                            <div class="stat-value" id="marketTrend">📈</div>
+                            <div class="stat-label">Market Trend</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-value" id="marketCap">$50T</div>
@@ -1435,6 +1435,9 @@
                 
                 // Update last update time
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                
+                // Update market trend (static for now)
+                document.getElementById('marketTrend').textContent = '📈';
                 
                 // Check scheduler status
                 try {
