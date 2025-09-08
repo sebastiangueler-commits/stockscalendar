@@ -1268,6 +1268,15 @@
                 });
                 
                 console.log(`📡 Response status: ${response.status}`);
+                console.log(`📡 Response headers:`, response.headers);
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('❌ Non-JSON response received:', text);
+                    throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}...`);
+                }
                 
                 const data = await response.json();
                 console.log(`📊 Response data:`, data);
@@ -1888,6 +1897,38 @@
             });
         });
 
+        // Test server connectivity
+        async function testServerConnectivity() {
+            try {
+                console.log('🔍 Testing server connectivity...');
+                
+                // Test health endpoint
+                const healthResponse = await fetch(`${API_BASE}/api/health`);
+                console.log('🏥 Health check status:', healthResponse.status);
+                
+                if (healthResponse.ok) {
+                    const healthData = await healthResponse.json();
+                    console.log('✅ Health check data:', healthData);
+                } else {
+                    console.error('❌ Health check failed');
+                }
+                
+                // Test database endpoint
+                const dbResponse = await fetch(`${API_BASE}/api/debug/database`);
+                console.log('🗄️ Database check status:', dbResponse.status);
+                
+                if (dbResponse.ok) {
+                    const dbData = await dbResponse.json();
+                    console.log('✅ Database check data:', dbData);
+                } else {
+                    console.error('❌ Database check failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Server connectivity test failed:', error);
+            }
+        }
+
         // Auto-refresh stats every 30 seconds
         setInterval(() => {
             if (currentUser) {
@@ -1897,6 +1938,9 @@
                 }
             }
         }, 30000);
+
+        // Test connectivity on page load
+        testServerConnectivity();
 
         // Close modals when clicking outside
         document.querySelectorAll('.modal').forEach(modal => {

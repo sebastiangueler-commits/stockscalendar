@@ -895,6 +895,15 @@ def active_users():
         logging.error(f"Error getting active users: {e}")
         return jsonify({'error': 'Failed to get active users'}), 500
 
+@app.route('/api/health')
+def health_check():
+    """Simple health check endpoint"""
+    return jsonify({
+        'status': 'ok',
+        'message': 'Server is running',
+        'timestamp': datetime.now().isoformat()
+    })
+
 @app.route('/api/debug/database')
 def debug_database():
     """Debug endpoint to check database status"""
