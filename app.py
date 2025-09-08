@@ -1106,8 +1106,8 @@ if __name__ == '__main__':
     print("🤖 Automated signal updates enabled")
     print("============================================================")
     
-    # Run in production mode if PORT is set
-    if os.environ.get('PORT'):
-        app.run(host='0.0.0.0', port=port, debug=False)
-    else:
+    # For Vercel deployment, don't run the server here
+    # Vercel will handle the server execution
+    if __name__ == '__main__':
+        # Only run locally
         app.run(host='0.0.0.0', port=port, debug=True)
