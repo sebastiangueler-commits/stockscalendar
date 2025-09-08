@@ -1089,27 +1089,27 @@ if __name__ == '__main__':
     # Initialize database
     init_database()
     
-    # Generate initial signals
-    generate_real_signals()
-    
-    # Start automated scheduler
-    start_scheduler()
-    
     # Get port from environment variable (for production)
     port = int(os.environ.get('PORT', 5003))
-    
-    print("🌐 Professional server started on http://localhost:5003")
-    print("📡 API endpoints available")
-    print("🔑 Admin access configured")
-    print("💰 PayPal Live integration active")
-    print("📊 Real-time market data enabled")
-    print("🤖 Automated signal updates enabled")
-    print("============================================================")
     
     # For Vercel deployment, don't run the server here
     # Vercel will handle the server execution
     if __name__ == '__main__':
         # Only run locally
+        # Generate initial signals
+        generate_real_signals()
+        
+        # Start automated scheduler
+        start_scheduler()
+        
+        print("🌐 Professional server started on http://localhost:5003")
+        print("📡 API endpoints available")
+        print("🔑 Admin access configured")
+        print("💰 PayPal Live integration active")
+        print("📊 Real-time market data enabled")
+        print("🤖 Automated signal updates enabled")
+        print("============================================================")
+        
         app.run(host='0.0.0.0', port=port, debug=True)
 
 # For Vercel deployment
